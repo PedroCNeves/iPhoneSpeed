@@ -1,4 +1,5 @@
-const CACHE = 'speed-app-v1';
+// Bump this string on every deploy to retire the previous cache.
+const CACHE = 'speed-app-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -27,7 +28,17 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// Network-first: always try the live file so a deploy shows up immediately;
+// fall back to cache only when offline. Refresh the cache on every hit.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request).then((cached) => cached || fetch(e.request)));
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });

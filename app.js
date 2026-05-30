@@ -220,7 +220,19 @@ holdToAct(el.overlay, 'unlocking', 1200, () => setLocked(false));
 
 /* ---------- service worker (installable / offline) ---------- */
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // when a new worker takes control, reload once so the fresh files show up
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloaded) return;
+    reloaded = true;
+    window.location.reload();
+  });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      reg.update();                       // check for a newer worker on each launch
+      setInterval(() => reg.update(), 60 * 60 * 1000);
+    }).catch(() => {});
+  });
 }
 
 /* iOS sometimes needs a first gesture before granting the wake lock */
