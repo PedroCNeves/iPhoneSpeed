@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <title>Speed</title>
+
+  <!-- PWA / iOS home-screen -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Speed" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <!-- km/h -->
+    <section class="speed-block">
+      <span id="kmh" class="speed-value">0</span>
+      <span class="speed-unit">km/h</span>
+    </section>
+
+    <hr class="separator" />
+
+    <!-- mph -->
+    <section class="speed-block">
+      <span id="mph" class="speed-value">0</span>
+      <span class="speed-unit">mph</span>
+    </section>
+
+    <hr class="separator" />
+
+    <!-- small stats -->
+    <section class="stats">
+      <div class="stat-row"><span class="stat-label">Distance</span><span><b id="distKm">0.00</b> km</span></div>
+      <div class="stat-row"><span class="stat-label">Distance</span><span><b id="distMi">0.00</b> mi</span></div>
+      <div class="stat-row"><span class="stat-label">Avg speed</span><span><b id="avgKph">0.0</b> km/h</span></div>
+
+      <div class="controls">
+        <!-- hold to reset: a fill ring grows while pressed -->
+        <button id="resetBtn" type="button" aria-label="Hold to reset distance and average">
+          <span class="reset-fill"></span>
+          <span class="reset-label">Hold to reset</span>
+        </button>
+        <!-- pocket lock toggle -->
+        <button id="lockBtn" type="button" aria-label="Lock screen against touches">Lock</button>
+      </div>
+    </section>
+
+    <p id="status" class="status">Starting &middot; allow location</p>
+  </main>
+
+  <!-- shown when locked; absorbs all touches; long-press to unlock -->
+  <div id="lockOverlay" class="lock-overlay hidden" aria-hidden="true">
+    <span class="lock-hint">Locked &middot; hold to unlock</span>
+    <span class="unlock-fill"></span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

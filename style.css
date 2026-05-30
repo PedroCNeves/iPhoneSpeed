@@ -1,0 +1,174 @@
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --accent: #00e676;   /* bright green, readable in sunlight */
+  --dim: #888;
+  --sep: #222;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, system-ui, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+#app {
+  height: 100%;
+  /* respect the iPhone notch / home indicator */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2vh;
+}
+
+/* --- speed (km/h + mph) --- */
+.speed-block {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25em;
+  line-height: 1;
+}
+
+.speed-value {
+  font-size: 34vw;          /* big */
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.speed-unit {
+  font-size: 17vw;          /* half the size */
+  font-weight: 500;
+  color: var(--dim);
+}
+
+.separator {
+  border: none;
+  border-top: 2px solid var(--sep);
+  width: 70%;
+  margin: 1vh auto;
+}
+
+/* --- small stats block --- */
+.stats {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 8vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vh;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 5vw;
+  color: var(--fg);
+}
+
+.stat-label { color: var(--dim); }
+.stat-row b { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+/* --- controls (kept small; bottom-anchored) --- */
+.controls {
+  margin-top: 1.5vh;
+  display: flex;
+  gap: 2.5vw;
+  align-items: stretch;
+}
+
+#resetBtn {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  padding: 2.6vw;
+  font-size: 3.6vw;        /* small on purpose */
+  font-weight: 600;
+  color: var(--fg);
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.reset-label { position: relative; z-index: 1; }
+/* green fill grows left→right over the hold duration */
+.reset-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  background: rgba(0, 230, 118, 0.35);
+  z-index: 0;
+}
+#resetBtn.holding .reset-fill { width: 100%; transition: width 1.5s linear; }
+
+#lockBtn {
+  flex: 0 0 auto;
+  padding: 2.6vw 5vw;
+  font-size: 3.6vw;
+  font-weight: 600;
+  color: var(--fg);
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  cursor: pointer;
+}
+#lockBtn:active, #resetBtn:active { background: #2a2a2a; }
+
+.status {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 6px);
+  text-align: center;
+  font-size: 3.4vw;
+  color: var(--dim);
+}
+.status.error { color: #ff5252; }
+.status.live  { color: var(--accent); }
+
+/* --- lock overlay: transparent layer that swallows touches.
+   The full UI (speed, distance, average) stays visible underneath; this only
+   blocks accidental taps. A small hint + thin progress bar show how to unlock. --- */
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: transparent;          /* everything underneath stays visible */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: calc(env(safe-area-inset-top) + 10px);
+  touch-action: none;               /* eat scrolls/gestures too */
+}
+.lock-overlay.hidden { display: none; }
+.lock-hint {
+  position: relative;
+  z-index: 1;
+  color: var(--dim);
+  font-size: 3.6vw;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1.5vw 3vw;
+  border-radius: 20px;
+}
+.unlock-fill {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 4px; width: 0%;
+  background: var(--accent);
+}
+.lock-overlay.unlocking .unlock-fill { width: 100%; transition: width 1.2s linear; }
